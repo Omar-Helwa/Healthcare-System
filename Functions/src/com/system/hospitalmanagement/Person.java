@@ -1,6 +1,6 @@
 package com.system.hospitalmanagement;
 
-public class Person {
+public abstract class Person {
     protected int id;
     protected String name;
     protected String address;
@@ -13,7 +13,6 @@ public class Person {
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.gender = gender;
-
-
 }
+
 }
