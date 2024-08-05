@@ -1,26 +1,26 @@
 package com.functions;
 
+import com.database.Database;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.print.Doc;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Doctor extends Person {
 
     private String specialty;
-    private static int lastId = 1;
-    private final int ID = lastId++;
-
-    private final static String CONN_STRING = "jdbc:mysql://localhost:3306/healthcare";
-    private final static String username = "root";
-    private final static String password = "Omar2005Helwa";
-    private static MysqlDataSource dataSource = new MysqlDataSource();
+    private static int lastId = loadLastId();
+    private final int ID;
+    private List<Doctor> doctors = new ArrayList<>();
 
     public Doctor(String name, String address, String phoneNumber, String specialty) {
         super(name, address, phoneNumber);
+        synchronized (Person.class){
+        ID = lastId++;
         this.specialty = specialty;
+        addDoctor(this);}
     }
 
     // Getter and setter for specialty
@@ -37,6 +37,13 @@ public class Doctor extends Person {
         return ID;
     }
 
+    public List<Doctor> getDoctors() {
+        return doctors;
+    }
+
+    private void addDoctor(Doctor doctor) {
+        doctors.add(doctor);
+    }
 
     // Method to edit doctor info
 //    public static void editDoctor(int id, String name, String address, String phoneNumber, String gender, String specialty) {
@@ -53,45 +60,44 @@ public class Doctor extends Person {
 //    }
 
 
-    public <T extends Doctor> int addD(T doctor) {
-        dataSource.setURL(CONN_STRING);
+    public  <T extends Doctor> int save() {
+        Database.connect();
         String query = "SELECT * FROM doctors";
-        String sql = " insert into doctors (name, address, phoneNumber, specialty)"
-                + " values (?, ?, ?, ?)";
-        try (var connection = dataSource.getConnection(
-                username, password);
+        String sql = " insert into doctors (idDoctors, name, address, phoneNumber, specialty)"
+                + " values (?, ?, ?, ?, ?)";
+        try (var connection = Database.connection();
              Statement statement = connection.createStatement();
              PreparedStatement preparedStmt = connection.prepareStatement(sql)
         ) {
+                for(var doctor: doctors) {
+                    ResultSet resultSet = statement.executeQuery(query);
 
-            ResultSet resultSet = statement.executeQuery(query);
+                    while (resultSet.next()) {
 
-            while (resultSet.next()) {
-
-                if (resultSet.getString("idDoctors" ).equals(doctor.getID())) {
-                    System.out.println("Record already exists" );
-                    return 1;
+                        if (resultSet.getInt("idDoctors") == (doctor.getID())) {
+                            System.out.println("Record already exists");
+//                            return 1;
+                        }
+                    }
+                    preparedStmt.setInt(1, doctor.getID());
+                    preparedStmt.setString(2, doctor.name);
+                    preparedStmt.setString(3, doctor.address);
+                    preparedStmt.setString(4, doctor.phoneNumber);
+                    preparedStmt.setString(5, doctor.getSpecialty());
+                    preparedStmt.execute();
                 }
-            }
-
-            preparedStmt.setString(1, doctor.name);
-            preparedStmt.setString(2, doctor.address);
-            preparedStmt.setString(3, doctor.phoneNumber);
-            preparedStmt.setString(4, doctor.getSpecialty());
-            preparedStmt.execute();
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return 0;
     }
 
+
     public <T extends Doctor> int delete(T doctor) {
-        dataSource.setURL(CONN_STRING);
+        Database.connect();
         String query = "SELECT * FROM doctors";
         String qry = "DELETE FROM doctors WHERE idDoctors= '%s'".formatted(doctor.getID());
-        try (var connection = dataSource.getConnection(
-                username, password);
+        try (var connection = Database.connection();
              Statement statement = connection.createStatement();
              PreparedStatement preparedStatement = connection.prepareStatement(qry);
         ) {
@@ -99,7 +105,7 @@ public class Doctor extends Person {
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                if ((resultSet.getString("idDoctor").equals(doctor.getID()))) {
+                if ((resultSet.getInt("idDoctors") == (doctor.getID()))) {
                     preparedStatement.execute();
                     System.out.println("Record deleted");
                     return 0;
@@ -111,5 +117,22 @@ public class Doctor extends Person {
             throw new RuntimeException(e);
         }
         return 1;
+    }
+
+
+    private static int loadLastId() {
+        Database.connect();
+        int lastId = 1; // Default value if loading fails
+        String query = "SELECT MAX(idDoctors) AS idDoctors FROM doctors";
+        try (Connection conn = Database.connection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    lastId = rs.getInt("idDoctors") +1;
+                }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lastId;
     }
 }

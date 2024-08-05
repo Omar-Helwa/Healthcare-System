@@ -1,11 +1,11 @@
 package com.functions;
 
+import com.database.Database;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Patient extends Person{
     private String gender;
@@ -14,13 +14,10 @@ public class Patient extends Person{
     private String diagnosis;
     private boolean emergency;
     private int roomNumber;
-    private static int lastId = 1;
-    private final int ID = lastId++;
+    private static int lastId = loadLastId();
+    private final int ID;
+    private List<Patient> patients = new ArrayList<>();
 
-    private final static String CONN_STRING = "jdbc:mysql://localhost:3306/healthcare";
-    private final static String username = "root";
-    private final static String password = "Omar2005Helwa";
-    private static MysqlDataSource dataSource = new MysqlDataSource();
 
     public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, int roomNumber) {
         super(name, address, phoneNumber);
@@ -29,6 +26,11 @@ public class Patient extends Person{
         this.paymentMethod = paymentMethod;
         this.diagnosis = diagnosis;
         this.roomNumber = roomNumber;
+        ID = lastId++;
+        addPatient(this);
+    }
+    private void addPatient(Patient patient) {
+        patients.add(patient);
     }
 
     public String getGender() {
@@ -83,13 +85,12 @@ public class Patient extends Person{
         this.roomNumber = roomNumber;
     }
 
-    public <T extends Patient> int addP(T patient) {
-        dataSource.setURL(CONN_STRING);
+    public <T extends Patient> int add(T patient) {
+        Database.connect();
         String query = "SELECT * FROM patients";
-        String sql = " insert into patients (name, address, phoneNumber, gender, symptoms, paymentMethod, diagno, emergency, roomNumber)"
-                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (var connection = dataSource.getConnection(
-                username, password);
+        String sql = " insert into patients (idpatients, name, address, phoneNumber, gender, symptoms, paymentMethod, diagno, emergency, roomNumber)"
+                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (var connection = Database.connection();
              Statement statement = connection.createStatement();
              PreparedStatement preparedStmt = connection.prepareStatement(sql)
         ) {
@@ -98,21 +99,21 @@ public class Patient extends Person{
 
             while (resultSet.next()) {
 
-                if (resultSet.getString("idpatients" ).equals(patient.getID())) {
+                if (resultSet.getInt("idpatients" ) == (patient.getID())) {
                     System.out.println("Record already exists" );
                     return 0;
                 }
             }
-
-            preparedStmt.setString(1, patient.name);
-            preparedStmt.setString(2, patient.address);
-            preparedStmt.setString(3, patient.phoneNumber);
-            preparedStmt.setString(4, patient.getGender());
-            preparedStmt.setString(5, patient.getSymptoms());
-            preparedStmt.setString(6, patient.getPaymentMethod());
-            preparedStmt.setString(7, patient.getDiagnosis());
-            preparedStmt.setBoolean(8, patient.isEmergency());
-//            preparedStmt.setInt(9, patient.getRoomNumber());
+            preparedStmt.setInt(1, patient.getID());
+            preparedStmt.setString(2, patient.name);
+            preparedStmt.setString(3, patient.address);
+            preparedStmt.setString(4, patient.phoneNumber);
+            preparedStmt.setString(5, patient.getGender());
+            preparedStmt.setString(6, patient.getSymptoms());
+            preparedStmt.setString(7, patient.getPaymentMethod());
+            preparedStmt.setString(8, patient.getDiagnosis());
+            preparedStmt.setBoolean(9, patient.isEmergency());
+            preparedStmt.setInt(10, patient.getRoomNumber());
             preparedStmt.execute();
 
         } catch (SQLException e) {
@@ -122,11 +123,10 @@ public class Patient extends Person{
     }
 
     public <T extends Patient> int delete(T patient) {
-        dataSource.setURL(CONN_STRING);
+        Database.connect();
         String query = "SELECT * FROM patients";
         String qry = "DELETE FROM patients WHERE idpatients= '%s'".formatted(patient.getID());
-        try (var connection = dataSource.getConnection(
-                username, password);
+        try (var connection = Database.connection();
              Statement statement = connection.createStatement();
              PreparedStatement preparedStatement = connection.prepareStatement(qry);
         ) {
@@ -134,7 +134,7 @@ public class Patient extends Person{
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                if ((resultSet.getString("idpatients").equals(patient.getID()))) {
+                if ((resultSet.getInt("idpatients") == (patient.getID()))) {
                     System.out.println("Record deleted");
                     preparedStatement.execute();
                     return 1;
@@ -146,5 +146,21 @@ public class Patient extends Person{
             throw new RuntimeException(e);
         }
         return 0;
+    }
+
+    private static int loadLastId() {
+        Database.connect();
+        int lastId = 1; // Default value if loading fails
+        String query = "SELECT MAX(idDoctors) AS idDoctors FROM doctors";
+        try (Connection conn = Database.connection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                lastId = rs.getInt("idDoctors") +1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lastId;
     }
 }
