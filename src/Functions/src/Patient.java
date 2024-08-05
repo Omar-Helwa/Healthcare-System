@@ -1,3 +1,5 @@
+package Functions.src;
+
 public class Patient extends Person{
     protected String symptoms;
     protected String paymentMethod;

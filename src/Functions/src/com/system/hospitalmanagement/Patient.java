@@ -1,4 +1,4 @@
-package com.system.hospitalmanagement;
+package Functions.src.com.system.hospitalmanagement;
 
 import java.util.ArrayList;
 import java.util.List;

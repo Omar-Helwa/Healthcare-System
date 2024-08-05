@@ -1,3 +1,5 @@
+package Functions.src.com.system.hospitalmanagement;
+
 public class EmergencyPatient extends Patient {
     private int roomNumber;
 

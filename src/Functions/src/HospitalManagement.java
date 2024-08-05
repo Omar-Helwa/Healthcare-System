@@ -1,3 +1,5 @@
+package Functions.src;
+
 import java.util.Scanner;
 
 public class HospitalManagement {
@@ -9,7 +11,7 @@ public class HospitalManagement {
 
     public static void main(String[] args) {
 
-        Doctor.addDoctor("Dr. Smith", "123 Main St", "555-1234", "Male", "Cardiology");
+        Doctor.addDoctor("Dr. Smith", "123 com.company.Main St", "555-1234", "Male", "Cardiology");
         Doctor.addDoctor("Dr. Johnson", "456 Elm St", "555-5678", "Female", "Neurology");
 
         displayAllDoctors();
