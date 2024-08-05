@@ -1,5 +1,6 @@
 package com.company;
 
+import com.database.Database;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
 import javax.swing.*;
@@ -11,38 +12,46 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String username = "devuser";
-        String password = "Omar2005Helwa@Rola";
-//        String username = JOptionPane.showInputDialog(
-//                null, "Enter DB Username");
+        Database database = new Database();
+        Doctor person = new Doctor("Omar","01062198421", "Madinaty", "Heart");
+        Doctor person2 = new Doctor("Ahmed","01034455232", "Madinaty", "Psychology");
+        Patient a7a = new Patient("Bima", "01087642356","tagamo3", "male","t","cash",false,34);
+        Patient a7 = new Patient("Nasry", "01087642356","Do2i", "b","bawasir","credit",false,96);
+
+//        database.addD(person2);
+
+//        String username = "devuser";
+//        String password = "Omar2005Helwa@Rola";
+////        String username = JOptionPane.showInputDialog(
+////                null, "Enter DB Username");
+////
+////        JPasswordField pf = new JPasswordField();
+////        int okCxl = JOptionPane.showConfirmDialog(null, pf,
+////                "Enter DB Password", JOptionPane.OK_CANCEL_OPTION);
+////
+////        final char[] password =
+////                (okCxl == JOptionPane.OK_OPTION) ? pf.getPassword() : null;
 //
-//        JPasswordField pf = new JPasswordField();
-//        int okCxl = JOptionPane.showConfirmDialog(null, pf,
-//                "Enter DB Password", JOptionPane.OK_CANCEL_OPTION);
 //
-//        final char[] password =
-//                (okCxl == JOptionPane.OK_OPTION) ? pf.getPassword() : null;
-
-
-        String query = "SELECT * FROM music.artists";
-        var dataSource = new MysqlDataSource();
-        dataSource.setURL(CONN_STRING);
-
-        try (var connection = dataSource.getConnection(
-                username, String.valueOf(password));
-             Statement statement = connection.createStatement();
-        ) {
-
-            ResultSet resultSet = statement.executeQuery(query);
-
-            while(resultSet.next()) {
-                System.out.printf("%d %s %n", resultSet.getInt(1),
-                        resultSet.getString("artist_name")
-                );
-            }
-//            Arrays.fill(password, ' ');
-        }catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+//        String query = "SELECT * FROM music.artists";
+//        var dataSource = new MysqlDataSource();
+//        dataSource.setURL(CONN_STRING);
+//
+//        try (var connection = dataSource.getConnection(
+//                username, String.valueOf(password));
+//             Statement statement = connection.createStatement();
+//        ) {
+//
+//            ResultSet resultSet = statement.executeQuery(query);
+//
+//            while(resultSet.next()) {
+//                System.out.printf("%d %s %n", resultSet.getInt(1),
+//                        resultSet.getString("artist_name")
+//                );
+//            }
+////            Arrays.fill(password, ' ');
+//        }catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }
