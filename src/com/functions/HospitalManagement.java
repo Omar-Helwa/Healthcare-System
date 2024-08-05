@@ -1,6 +1,4 @@
-package Functions.src;
-
-import java.util.Scanner;
+package com.functions;
 
 public class HospitalManagement {
     public static void displayAllDoctors() {

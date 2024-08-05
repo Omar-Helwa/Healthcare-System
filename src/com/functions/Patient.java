@@ -1,4 +1,4 @@
-package Functions.src;
+package com.functions;
 
 public class Patient extends Person{
     protected String symptoms;

@@ -1,4 +1,4 @@
-package Functions.src.com.system.hospitalmanagement;
+package com.functions;
 
 public class EmergencyPatient extends Patient {
     private int roomNumber;

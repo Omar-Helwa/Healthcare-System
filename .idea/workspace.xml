@@ -2,14 +2,42 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="94d13b48-f0fe-4132-8249-d49ed51d0001" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Functions/src/com/system/hospitalmanagement/Appointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/src/com.company/system/hospitalmanagement/Appointment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/src/com/system/hospitalmanagement/Doctor.java" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/src/com.company/system/hospitalmanagement/Doctor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/src/com/system/hospitalmanagement/EmergencyPatient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/src/com.company/system/hospitalmanagement/EmergencyPatient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/src/com/system/hospitalmanagement/HospitalManagement.java" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/src/com.company/system/hospitalmanagement/HospitalManagement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/src/com/system/hospitalmanagement/NormalPatient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/src/com.company/system/hospitalmanagement/NormalPatient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/src/com/system/hospitalmanagement/Patient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/src/com.company/system/hospitalmanagement/Patient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/src/com/system/hospitalmanagement/Person.java" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/src/com.company/system/hospitalmanagement/Person.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/company/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/.idea/description.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/.idea/libraries/mysql_connector_j_9_0_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/.idea/project-template.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/mysql_test.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/out/production/mysql_test/com/company/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqltest/mysql_test/src/com/company/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Healthcare-System/com/company/Doctor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Healthcare-System/com/company/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Healthcare-System/com/company/Patient.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Healthcare-System/com/company/Person.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Healthcare-System/com/database/Database.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/Functions.iml" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/Functions.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/Doctor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/Doctor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/EmergencyPatient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/EmergencyPatient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/HospitalManagement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/HospitalManagement.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/Patient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/Patient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/Person.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/Person.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/com/system/hospitalmanagement/Appointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/Appointment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/com/system/hospitalmanagement/Doctor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/com/system/hospitalmanagement/EmergencyPatient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/com/system/hospitalmanagement/HospitalManagement.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/com/system/hospitalmanagement/NormalPatient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/functions/NormalPatient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/com/system/hospitalmanagement/Patient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Functions/src/com/system/hospitalmanagement/Person.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/company/Doctor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/company/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/company/Patient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/company/Person.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,6 +143,11 @@
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Healthcare-System\src" />
+    </key>
   </component>
   <component name="RunManager" selected="Application.Main">
     <configuration name="Database" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
