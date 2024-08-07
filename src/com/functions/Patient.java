@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Patient extends Person{
     private String gender;
@@ -16,6 +18,7 @@ public class Patient extends Person{
     private int roomNumber;
     private static int lastId = 1;
     private final int ID = lastId++;
+    protected List<Doctor> doctorInCharge;
 
     private final static String CONN_STRING = "jdbc:mysql://localhost:3306/healthcare";
     private final static String username = "root";
@@ -29,6 +32,7 @@ public class Patient extends Person{
         this.paymentMethod = paymentMethod;
         this.diagnosis = diagnosis;
         this.roomNumber = roomNumber;
+        this.doctorInCharge = new ArrayList<>();
     }
 
     public String getGender() {
@@ -81,6 +85,17 @@ public class Patient extends Person{
 
     public void setRoomNumber(int roomNumber) {
         this.roomNumber = roomNumber;
+    }
+
+    
+    public boolean createAppointment(Doctor doctor, List<Appointment> appointments) {
+        if (doctor == null || !HospitalManagement.getInstance().doctorExists(doctor) || !HospitalManagement.getInstance().patientExists(this)) {
+            return false;
+        }
+
+        Appointment appointment = new Appointment(this, doctor);
+        appointments.add(appointment);
+        return true;
     }
 
     public <T extends Patient> int addP(T patient) {
@@ -147,4 +162,15 @@ public class Patient extends Person{
         }
         return 0;
     }
+
+
+    public List<Doctor> getDoctorInCharge() {
+        return doctorInCharge;
+    }
+
+    public boolean addDoctorInCharge(Doctor doctor) {
+        if (doctor == null) return false;
+        return doctorInCharge.add(doctor);
+    }
+
 }
