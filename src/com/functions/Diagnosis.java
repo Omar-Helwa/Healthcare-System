@@ -4,7 +4,7 @@ public class Diagnosis {
     
     private int patientID;
     private int physicianID;
-    private String prescribed;
+    private String[] prescribed;
    
 
     public int getPatientID() {
@@ -21,10 +21,10 @@ public class Diagnosis {
         this.physicianID = physicianID;
     }
 
-    public String getPrescribed() {
+    public String[] getPrescribed() {
         return prescribed;
     }
-    public void setPrescribed(String prescribed) {
+    public void setPrescribed(String[] prescribed) {
         this.prescribed = prescribed;
     }
 
