@@ -1,6 +1,6 @@
 package com.functions;
 
-import com.database.Database;
+import com.database.DatabaseConnector;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,9 +9,9 @@ import java.sql.Statement;
 public class HospitalManagement {
 
     public <T extends Doctor> void displayDoctors() {
-        Database.connect();
+        DatabaseConnector.connect();
         String query = "SELECT * FROM doctors";
-        try (var connection = Database.connection();
+        try (var connection = DatabaseConnector.connection();
              Statement statement = connection.createStatement()) {
 
             ResultSet resultSet = statement.executeQuery(query);
@@ -26,9 +26,9 @@ public class HospitalManagement {
     }
 
     public <T extends Doctor> void displayPatients() {
-        Database.connect();
+        DatabaseConnector.connect();
         String query = "SELECT * FROM patients";
-        try (var connection = Database.connection();
+        try (var connection = DatabaseConnector.connection();
              Statement statement = connection.createStatement()) {
 
             ResultSet resultSet = statement.executeQuery(query);

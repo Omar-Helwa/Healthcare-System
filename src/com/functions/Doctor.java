@@ -1,43 +1,38 @@
 package com.functions;
 
 import com.database.Database;
-import com.mysql.cj.jdbc.MysqlDataSource;
+import com.database.DatabaseConnector;
 
-import javax.print.Doc;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Doctor extends Person {
+public class Doctor extends Person implements Database {
 
     private String specialty;
     private static int lastId = loadLastId();
     private final int ID;
-    private List<Doctor> doctors = new ArrayList<>();
+    private Set<Doctor> doctors = new HashSet<>();
 
     public Doctor(String name, String address, String phoneNumber, String specialty) {
         super(name, address, phoneNumber);
         synchronized (Person.class){
         ID = lastId++;
         this.specialty = specialty;
-        addDoctor(this);}
+        addDoctor(this);
+        }
     }
-
-    // Getter and setter for specialty
 
     public String getSpecialty() {
         return specialty;
     }
 
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
-    }
 
     public int getID() {
         return ID;
     }
 
-    public List<Doctor> getDoctors() {
+    public Set<Doctor> getDoctors() {
         return doctors;
     }
 
@@ -59,13 +54,13 @@ public class Doctor extends Person {
 //        }
 //    }
 
-
-    public  <T extends Doctor> int save() {
-        Database.connect();
+@Override
+    public  <T extends Person> boolean save() {
+        DatabaseConnector.connect();
         String query = "SELECT * FROM doctors";
         String sql = " insert into doctors (idDoctors, name, address, phoneNumber, specialty)"
                 + " values (?, ?, ?, ?, ?)";
-        try (var connection = Database.connection();
+        try (var connection = DatabaseConnector.connection();
              Statement statement = connection.createStatement();
              PreparedStatement preparedStmt = connection.prepareStatement(sql)
         ) {
@@ -76,7 +71,6 @@ public class Doctor extends Person {
 
                         if (resultSet.getInt("idDoctors") == (doctor.getID())) {
                             System.out.println("Record already exists");
-//                            return 1;
                         }
                     }
                     preparedStmt.setInt(1, doctor.getID());
@@ -89,15 +83,15 @@ public class Doctor extends Person {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return 0;
+        return false;
     }
 
-
-    public <T extends Doctor> int delete(T doctor) {
-        Database.connect();
+@Override
+    public <T extends Person> boolean delete(T doctor) {
+        DatabaseConnector.connect();
         String query = "SELECT * FROM doctors";
         String qry = "DELETE FROM doctors WHERE idDoctors= '%s'".formatted(doctor.getID());
-        try (var connection = Database.connection();
+        try (var connection = DatabaseConnector.connection();
              Statement statement = connection.createStatement();
              PreparedStatement preparedStatement = connection.prepareStatement(qry);
         ) {
@@ -108,7 +102,7 @@ public class Doctor extends Person {
                 if ((resultSet.getInt("idDoctors") == (doctor.getID()))) {
                     preparedStatement.execute();
                     System.out.println("Record deleted");
-                    return 0;
+                    return true;
                 }
             }
             System.out.println("record doesn't exist");
@@ -116,23 +110,24 @@ public class Doctor extends Person {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return 1;
+        return false;
     }
 
 
     private static int loadLastId() {
-        Database.connect();
+        DatabaseConnector.connect();
         int lastId = 1; // Default value if loading fails
         String query = "SELECT MAX(idDoctors) AS idDoctors FROM doctors";
-        try (Connection conn = Database.connection();
+        try (Connection conn = DatabaseConnector.connection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
-                    lastId = rs.getInt("idDoctors") +1;
+                    lastId = rs.getInt("idDoctors");
                 }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return lastId;
     }
+
 }

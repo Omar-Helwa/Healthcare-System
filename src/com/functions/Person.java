@@ -23,4 +23,8 @@ public class Person {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    protected int getID() {
+        return 0;
+    }
 }

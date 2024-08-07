@@ -1,34 +1,30 @@
 package com.functions;
 
 
+import java.util.Date;
+
 public class Appointment {
 
-    private Patient patient;
-    private Doctor doctor;
+    private int patientId;
+    private int doctorId;
+    private Date date;
 
-    public Appointment(Patient patient, Doctor doctor) {
-        this.patient = patient;
-        this.doctor = doctor;
+    public Appointment(int patientId, int doctorId) {
+        this.doctorId = patientId;
+        this.doctorId = doctorId;
 
     }
 
-    public Patient getPatient() {
-        return patient;
+    public int getPatientId() {
+        return patientId;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public int getDoctorId() {
+        return doctorId;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
-    }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
-    }
-
-    
+//   public void
 }
     
 

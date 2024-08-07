@@ -1,13 +1,15 @@
 package com.functions;
 
 import com.database.Database;
-import com.mysql.cj.jdbc.MysqlDataSource;
+import com.database.DatabaseConnector;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class Patient extends Person{
+public class Patient extends Person implements Database {
     private String gender;
     private String symptoms;
     private String paymentMethod;
@@ -16,7 +18,7 @@ public class Patient extends Person{
     private int roomNumber;
     private static int lastId = loadLastId();
     private final int ID;
-    private List<Patient> patients = new ArrayList<>();
+    private Set<Patient> patients = new HashSet<>();
 
 
     public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, int roomNumber) {
@@ -85,48 +87,50 @@ public class Patient extends Person{
         this.roomNumber = roomNumber;
     }
 
-    public <T extends Patient> int add(T patient) {
-        Database.connect();
+    @Override
+    public <T extends Person> boolean save() {
+        DatabaseConnector.connect();
         String query = "SELECT * FROM patients";
         String sql = " insert into patients (idpatients, name, address, phoneNumber, gender, symptoms, paymentMethod, diagno, emergency, roomNumber)"
                 + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (var connection = Database.connection();
+        try (var connection = DatabaseConnector.connection();
              Statement statement = connection.createStatement();
              PreparedStatement preparedStmt = connection.prepareStatement(sql)
         ) {
 
-            ResultSet resultSet = statement.executeQuery(query);
+            for(Patient patient : patients) {
+                ResultSet resultSet = statement.executeQuery(query);
 
-            while (resultSet.next()) {
+                while (resultSet.next()) {
 
-                if (resultSet.getInt("idpatients" ) == (patient.getID())) {
-                    System.out.println("Record already exists" );
-                    return 0;
+                    if (resultSet.getInt("idpatients") == (patient.getID())) {
+                        System.out.println("Record already exists");
+                    }
                 }
+                preparedStmt.setInt(1, patient.getID());
+                preparedStmt.setString(2, patient.name);
+                preparedStmt.setString(3, patient.address);
+                preparedStmt.setString(4, patient.phoneNumber);
+                preparedStmt.setString(5, patient.getGender());
+                preparedStmt.setString(6, patient.getSymptoms());
+                preparedStmt.setString(7, patient.getPaymentMethod());
+                preparedStmt.setString(8, patient.getDiagnosis());
+                preparedStmt.setBoolean(9, patient.isEmergency());
+                preparedStmt.setInt(10, patient.getRoomNumber());
+                preparedStmt.execute();
             }
-            preparedStmt.setInt(1, patient.getID());
-            preparedStmt.setString(2, patient.name);
-            preparedStmt.setString(3, patient.address);
-            preparedStmt.setString(4, patient.phoneNumber);
-            preparedStmt.setString(5, patient.getGender());
-            preparedStmt.setString(6, patient.getSymptoms());
-            preparedStmt.setString(7, patient.getPaymentMethod());
-            preparedStmt.setString(8, patient.getDiagnosis());
-            preparedStmt.setBoolean(9, patient.isEmergency());
-            preparedStmt.setInt(10, patient.getRoomNumber());
-            preparedStmt.execute();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return 1;
+        return true;
     }
-
-    public <T extends Patient> int delete(T patient) {
-        Database.connect();
+@Override
+    public <T extends Person> boolean delete(T patient) {
+        DatabaseConnector.connect();
         String query = "SELECT * FROM patients";
         String qry = "DELETE FROM patients WHERE idpatients= '%s'".formatted(patient.getID());
-        try (var connection = Database.connection();
+        try (var connection = DatabaseConnector.connection();
              Statement statement = connection.createStatement();
              PreparedStatement preparedStatement = connection.prepareStatement(qry);
         ) {
@@ -137,7 +141,7 @@ public class Patient extends Person{
                 if ((resultSet.getInt("idpatients") == (patient.getID()))) {
                     System.out.println("Record deleted");
                     preparedStatement.execute();
-                    return 1;
+                    return true;
                 }
             }
             System.out.println("record doesn't exist");
@@ -145,14 +149,14 @@ public class Patient extends Person{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return 0;
+        return false;
     }
 
     private static int loadLastId() {
-        Database.connect();
+        DatabaseConnector.connect();
         int lastId = 1; // Default value if loading fails
         String query = "SELECT MAX(idDoctors) AS idDoctors FROM doctors";
-        try (Connection conn = Database.connection();
+        try (Connection conn = DatabaseConnector.connection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
