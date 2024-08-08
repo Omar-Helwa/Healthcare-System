@@ -14,19 +14,20 @@ public class Patient extends Person implements Database {
     private String symptoms;
     private String paymentMethod;
     private String diagnosis;
-    private boolean emergency;
+    private boolean emergency = Boolean.parseBoolean(null);
     private int roomNumber;
     private static int lastId = loadLastId();
     private final int ID;
     private Set<Patient> patients = new HashSet<>();
 
 
-    public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, int roomNumber) {
+    public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, boolean emergency, int roomNumber) {
         super(name, address, phoneNumber);
         this.gender = gender;
         this.symptoms = symptoms;
         this.paymentMethod = paymentMethod;
         this.diagnosis = diagnosis;
+        this.emergency = emergency;
         this.roomNumber = roomNumber;
         ID = lastId++;
         addPatient(this);
