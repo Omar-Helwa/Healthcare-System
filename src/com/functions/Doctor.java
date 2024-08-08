@@ -4,6 +4,7 @@ import com.database.Database;
 import com.database.DatabaseConnector;
 
 import java.sql.*;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +14,7 @@ public class Doctor extends Person implements Database {
     private static int lastId = loadLastId();
     private final int ID;
     private Set<Doctor> doctors = new HashSet<>();
+    private HashMap<Integer, Doctor> doctors1= new HashMap<>();
 
     public Doctor(String name, String address, String phoneNumber, String specialty) {
         super(name, address, phoneNumber);

@@ -1,5 +1,7 @@
 package com.database;
 
+import com.functions.Doctor;
+import com.functions.Patient;
 import com.functions.Person;
 
 public interface Database {
