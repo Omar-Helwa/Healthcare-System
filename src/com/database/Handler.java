@@ -2,45 +2,112 @@ package com.database;
 
 import com.functions.Doctor;
 import com.functions.Patient;
-import com.functions.Person;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.Map;
 
 public class Handler {
 
-    HashMap<Integer, Doctor> doctors = new HashMap<>();
-    HashMap<Integer, Patient> patients = new HashMap<Integer, Patient>();
-
-    public  <T extends Person> boolean load() {
+    public static Map<Integer, Doctor> loadDoctors() {
+        Map<Integer, Doctor> doctors = new HashMap<>();
+        
         DatabaseConnector.connect();
-        String query = "SELECT * FROM doctors";
-        String query2 = "SELECT * FROM patients";
-        try (var connection = DatabaseConnector.connection();
-             Statement statement = connection.createStatement()) {
+        Connection connection = null;
+        try {
+            // Establish the connection
+           connection = DatabaseConnector.connection();
 
-                ResultSet resultSet = statement.executeQuery(query);
-                ResultSet resultSet2 = statement.executeQuery(query2);
+            // SQL query to retrieve data
+            String sql = "SELECT * FROM doctors";
 
-                while (resultSet.next()) {
-                    doctors.put(resultSet.getInt(1),new Doctor(resultSet.getString("name"),
-                            resultSet.getString("address"),resultSet.getString("phoneNumber"), resultSet.getNString("specialty")));
+            // Prepare statement and execute query
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-                    patients.put(resultSet2.getInt(1),new Patient(resultSet2.getString("name"),
-                            resultSet2.getString("address"),resultSet2.getString("phoneNumber"), resultSet2.getString("gender"),
-                            resultSet2.getString("symptoms"),resultSet2.getString("paymentMethod"),
-                            resultSet2.getString("diagno"), resultSet2.getBoolean("emergency"),
-                            resultSet2.getInt("roomNumber")));
-                }
+            // Process the result set and populate the HashMap
+            while (resultSet.next()) {
+                int id = resultSet.getInt("idDoctors");
+                Doctor doctor = new Doctor(
+                        resultSet.getString("name"),
+                        resultSet.getString("address"),
+                        resultSet.getString("phoneNumber"),
+                        resultSet.getString("specialty"));
+
+                doctors.put(id, doctor);
+            }
+
+            // Close the ResultSet and PreparedStatement
+            resultSet.close();
+            preparedStatement.close();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close(); // Close the connection
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        return false;
+
+        return doctors;
+    }
+
+
+
+    public static Map<Integer, Patient> loadPatients() {
+        Map<Integer, Patient> patientHashMap = new HashMap<>();
+
+        DatabaseConnector.connect();
+        Connection connection = null;
+        try {
+            // Establish the connection
+            connection = DatabaseConnector.connection();
+
+            // SQL query to retrieve data
+            String sql = "SELECT * FROM patients";
+
+            // Prepare statement and execute query
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Process the result set and populate the HashMap
+            while (resultSet.next()) {
+                int id = resultSet.getInt("idpatients");
+                Patient patient = new Patient(
+                        resultSet.getString("name"),
+                        resultSet.getString("address"),
+                        resultSet.getString("phoneNumber"),
+                        resultSet.getString("gender"),
+                        resultSet.getString("symptoms"),
+                        resultSet.getString("paymentMethod"),
+                        resultSet.getString("diagno"),
+                        resultSet.getBoolean("emergency"),
+                        resultSet.getInt("roomNumber"));
+
+                patientHashMap.put(id, patient);
+            }
+
+            // Close the ResultSet and PreparedStatement
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close(); // Close the connection
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return patientHashMap;
     }
 
 }

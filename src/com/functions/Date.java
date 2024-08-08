@@ -8,7 +8,8 @@ public class Date {
     private int day;
     private int month;
     private int year;
-    public boolean setDay(int day) {
+
+    public void setDay(int day) {
         this.day = day;
     }
     public void setMonth(int month) {

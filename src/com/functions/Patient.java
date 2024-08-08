@@ -1,24 +1,26 @@
 package com.functions;
 
-import com.database.Database;
 import com.database.DatabaseConnector;
+import com.database.Handler;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-public class Patient extends Person implements Database {
+public class Patient extends Person {
     private String gender;
     private String symptoms;
     private String paymentMethod;
     private String diagnosis;
-    private boolean emergency = Boolean.parseBoolean(null);
+    private boolean emergency;
     private int roomNumber;
     private static int lastId = loadLastId();
     private final int ID;
-    private Set<Patient> patients = new HashSet<>();
+    private static Set<Patient> patients = new HashSet<>();
+
+    static {
+        patients = loadToHashSet(); // Load from database after initialization
+        Map<Integer, Patient> patientMap = Handler.loadPatients();
+    }
 
 
     public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, boolean emergency, int roomNumber) {
@@ -88,26 +90,27 @@ public class Patient extends Person implements Database {
         this.roomNumber = roomNumber;
     }
 
-    @Override
-    public <T extends Person> boolean save() {
+
+    public boolean save() {
         DatabaseConnector.connect();
-        String query = "SELECT * FROM patients";
-        String sql = " insert into patients (idpatients, name, address, phoneNumber, gender, symptoms, paymentMethod, diagno, emergency, roomNumber)"
-                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String checkQuery = "SELECT COUNT(*) FROM patients WHERE phoneNumber = ?";
+        String sql = "INSERT INTO patients (idpatients, name, address, phoneNumber, gender, symptoms, paymentMethod, diagno, emergency, roomNumber)"
+                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (var connection = DatabaseConnector.connection();
-             Statement statement = connection.createStatement();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)
-        ) {
+             PreparedStatement preparedStmt = connection.prepareStatement(sql);
+             PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
 
-            for(Patient patient : patients) {
-                ResultSet resultSet = statement.executeQuery(query);
-
-                while (resultSet.next()) {
-
-                    if (resultSet.getInt("idpatients") == (patient.getID())) {
-                        System.out.println("Record already exists");
-                    }
+            for (Patient patient : patients) {
+                // Check for duplicates
+                checkStmt.setString(1, patient.phoneNumber);
+                ResultSet resultSet = checkStmt.executeQuery();
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    System.out.println("Record already exists for phone number: " + patient.phoneNumber);
+                    continue; // Skip saving this patient
                 }
+
+                // Save patient if no duplicates
                 preparedStmt.setInt(1, patient.getID());
                 preparedStmt.setString(2, patient.name);
                 preparedStmt.setString(3, patient.address);
@@ -120,14 +123,14 @@ public class Patient extends Person implements Database {
                 preparedStmt.setInt(10, patient.getRoomNumber());
                 preparedStmt.execute();
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return true;
     }
-@Override
-    public <T extends Person> boolean delete(T patient) {
+
+
+    public boolean delete(Patient patient) {
         DatabaseConnector.connect();
         String query = "SELECT * FROM patients";
         String qry = "DELETE FROM patients WHERE idpatients= '%s'".formatted(patient.getID());
@@ -139,7 +142,7 @@ public class Patient extends Person implements Database {
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                if ((resultSet.getInt("idpatients") == (patient.getID()))) {
+                if (resultSet.getString("phoneNumber").equals(patient.phoneNumber)) {
                     System.out.println("Record deleted");
                     preparedStatement.execute();
                     return true;
@@ -167,5 +170,13 @@ public class Patient extends Person implements Database {
             e.printStackTrace();
         }
         return lastId;
+    }
+
+    private static HashSet<Patient> loadToHashSet(){
+        HashSet<Patient> patientsCopy = new HashSet<>();
+        for (Patient i : Handler.loadPatients().values()) {
+            patientsCopy.add(i);
+        }
+        return patientsCopy;
     }
 }

@@ -1,25 +1,29 @@
 package com.functions;
 
-import com.database.Database;
 import com.database.DatabaseConnector;
+import com.database.Handler;
 
 import java.sql.*;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-public class Doctor extends Person implements Database {
+public class Doctor extends Person{
 
     private String specialty;
     private static int lastId = loadLastId();
-    private final int ID;
-    private Set<Doctor> doctors = new HashSet<>();
-    private HashMap<Integer, Doctor> doctors1= new HashMap<>();
+    private final int ID = lastId++;
+    private static HashSet<Doctor> doctors = new HashSet<>();
+
+    static {
+    doctors = loadToHashSet(); // Load from database after initialization
+        Map<Integer, Doctor> doctorHashMap = Handler.loadDoctors();
+}
 
     public Doctor(String name, String address, String phoneNumber, String specialty) {
         super(name, address, phoneNumber);
         synchronized (Person.class){
-        ID = lastId++;
         this.specialty = specialty;
         addDoctor(this);
         }
@@ -34,7 +38,7 @@ public class Doctor extends Person implements Database {
         return ID;
     }
 
-    public Set<Doctor> getDoctors() {
+    public static Set<Doctor> getDoctors() {
         return doctors;
     }
 
@@ -56,40 +60,41 @@ public class Doctor extends Person implements Database {
 //        }
 //    }
 
-@Override
-    public  <T extends Person> boolean save() {
+
+    public static boolean save() {
         DatabaseConnector.connect();
-        String query = "SELECT * FROM doctors";
-        String sql = " insert into doctors (idDoctors, name, address, phoneNumber, specialty)"
-                + " values (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO doctors (idDoctors, name, address, phoneNumber, specialty) VALUES (?, ?, ?, ?, ?)";
+        String checkQuery = "SELECT COUNT(*) FROM doctors WHERE phoneNumber = ?";
         try (var connection = DatabaseConnector.connection();
-             Statement statement = connection.createStatement();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)
-        ) {
-                for(var doctor: doctors) {
-                    ResultSet resultSet = statement.executeQuery(query);
+             PreparedStatement preparedStmt = connection.prepareStatement(sql);
+             PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
 
-                    while (resultSet.next()) {
-
-                        if (resultSet.getInt("idDoctors") == (doctor.getID())) {
-                            System.out.println("Record already exists");
-                        }
-                    }
-                    preparedStmt.setInt(1, doctor.getID());
-                    preparedStmt.setString(2, doctor.name);
-                    preparedStmt.setString(3, doctor.address);
-                    preparedStmt.setString(4, doctor.phoneNumber);
-                    preparedStmt.setString(5, doctor.getSpecialty());
-                    preparedStmt.execute();
+            for (var doctor : doctors) {
+                // Check for duplicates
+                checkStmt.setString(1, doctor.phoneNumber);
+                ResultSet resultSet = checkStmt.executeQuery();
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    System.out.println("Record already exists");
+                    continue; // Skip saving this doctor
                 }
+
+                // Save doctor if no duplicates
+                preparedStmt.setInt(1, doctor.getID());
+                preparedStmt.setString(2, doctor.name);
+                preparedStmt.setString(3, doctor.address);
+                preparedStmt.setString(4, doctor.phoneNumber);
+                preparedStmt.setString(5, doctor.getSpecialty());
+                preparedStmt.execute();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return false;
+        return true;
     }
 
-@Override
-    public <T extends Person> boolean delete(T doctor) {
+
+
+    public boolean delete(Doctor doctor) {
         DatabaseConnector.connect();
         String query = "SELECT * FROM doctors";
         String qry = "DELETE FROM doctors WHERE idDoctors= '%s'".formatted(doctor.getID());
@@ -101,7 +106,7 @@ public class Doctor extends Person implements Database {
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                if ((resultSet.getInt("idDoctors") == (doctor.getID()))) {
+                if (resultSet.getString("phoneNumber").equals(doctor.phoneNumber)) {
                     preparedStatement.execute();
                     System.out.println("Record deleted");
                     return true;
@@ -132,4 +137,22 @@ public class Doctor extends Person implements Database {
         return lastId;
     }
 
+    private static HashSet<Doctor> loadToHashSet(){
+        HashSet<Doctor> doctorsCopy = new HashSet<>();
+        for (Doctor i : Handler.loadDoctors().values()) {
+            doctorsCopy.add(i);
+        }
+        return doctorsCopy;
+    }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "specialty='" + specialty + '\'' +
+                ", ID=" + ID +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
+    }
 }

@@ -5,14 +5,16 @@ public class EmergencyPatient extends Patient {
     // private Doctor[] doctorInCharge;
     
     public EmergencyPatient(String name, String address, String phoneNumber, String gender,
-     String symptoms,String paymentMethod, String diagnosis, int roomNumber) {
-        super(name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, roomNumber);
+     String symptoms,String paymentMethod, String diagnosis,boolean emergency, int roomNumber) {
+        super(name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, emergency, roomNumber);
         setEmergency(true);
         this.roomNumber = roomNumber;
         // this.doctorInCharge = new Doctor[0];
     }
 
-    public int getRoomNumber(){  
+
+
+    public int getRoomNumber(){
         return roomNumber;
     }
 
