@@ -17,15 +17,15 @@ public class Doctor extends Person{
     private static HashSet<Doctor> doctors = new HashSet<>();
 
     static {
-    doctors = loadToHashSet(); // Load from database after initialization
+        doctors = loadToHashSet(); // Load from database after initialization
         Map<Integer, Doctor> doctorHashMap = Handler.loadDoctors();
-}
+    }
 
     public Doctor(String name, String address, String phoneNumber, String specialty) {
         super(name, address, phoneNumber);
         synchronized (Person.class){
-        this.specialty = specialty;
-        addDoctor(this);
+            this.specialty = specialty;
+            addDoctor(this);
         }
     }
 
@@ -127,10 +127,10 @@ public class Doctor extends Person{
         String query = "SELECT MAX(idDoctors) AS idDoctors FROM doctors";
         try (Connection conn = DatabaseConnector.connection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    lastId = rs.getInt("idDoctors");
-                }
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                lastId = rs.getInt("idDoctors");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
