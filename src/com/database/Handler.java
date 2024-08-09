@@ -1,5 +1,6 @@
 package com.database;
 
+import com.functions.Appointment;
 import com.functions.Doctor;
 import com.functions.Patient;
 
@@ -108,6 +109,52 @@ public class Handler {
         }
 
         return patientHashMap;
+    }
+
+    public static Map<Integer, Appointment> loadAppointments() {
+        Map<Integer, Appointment> appointments = new HashMap<>();
+
+        DatabaseConnector.connect();
+        Connection connection = null;
+        try {
+            // Establish the connection
+            connection = DatabaseConnector.connection();
+
+            // SQL query to retrieve data
+            String sql = "SELECT * FROM appointments";
+
+            // Prepare statement and execute query
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Process the result set and populate the HashMap
+            while (resultSet.next()) {
+                int id = resultSet.getInt("idappointments");
+                Appointment appointment = new Appointment(
+                        resultSet.getInt("physicianId"),
+                        resultSet.getInt("patientId")
+                );
+
+                appointments.put(id, appointment);
+            }
+
+            // Close the ResultSet and PreparedStatement
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close(); // Close the connection
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return appointments;
     }
 
 }
