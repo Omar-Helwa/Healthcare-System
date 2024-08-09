@@ -30,6 +30,7 @@ public class Appointment {
     public Appointment(int patientId, int doctorId) {
         this.doctorId = patientId;
         this.doctorId = doctorId;
+        add(this);
 
     }
 
@@ -43,6 +44,9 @@ public class Appointment {
 
     public int getID() {
         return ID;
+    }
+    private void add(Appointment appointment) {
+        appointments.add(appointment);
     }
 
     public static boolean save() {
