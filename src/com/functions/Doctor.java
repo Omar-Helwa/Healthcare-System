@@ -147,12 +147,6 @@ public class Doctor extends Person{
 
     @Override
     public String toString() {
-        return "Doctor{" +
-                "specialty='" + specialty + '\'' +
-                ", ID=" + ID +
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                '}';
+        return "[%d] %s %s %s %s".formatted(getID(), name, address, phoneNumber, specialty);
     }
 }

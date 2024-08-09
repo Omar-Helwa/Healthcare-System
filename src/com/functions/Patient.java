@@ -91,7 +91,7 @@ public class Patient extends Person {
     }
 
 
-    public boolean save() {
+    public static boolean save() {
         DatabaseConnector.connect();
         String checkQuery = "SELECT COUNT(*) FROM patients WHERE phoneNumber = ?";
         String sql = "INSERT INTO patients (idpatients, name, address, phoneNumber, gender, symptoms, paymentMethod, diagno, emergency, roomNumber)"
@@ -178,5 +178,10 @@ public class Patient extends Person {
             patientsCopy.add(i);
         }
         return patientsCopy;
+    }
+
+    @Override
+    public String toString() {
+        return "Patient{[%d] %s %s %s %s %s %s %s %b %d}".formatted(getID(), name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, emergency, roomNumber);
     }
 }
