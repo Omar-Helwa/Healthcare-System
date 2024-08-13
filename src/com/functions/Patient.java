@@ -13,18 +13,18 @@ public class Patient extends Person {
     private String diagnosis;
     private boolean emergency;
     private int roomNumber;
-    private int doctorInCharge;
+    private String doctorInCharge;
     private static int lastId = loadLastId();
     private final int ID;
     private static Set<Patient> patients = new HashSet<>();
-
+    private static Map<Integer, Patient> patientsMap= Handler.loadPatients();
     static {
         patients = loadToHashSet(); // Load from database after initialization
-        Map<Integer, Patient> patientMap = Handler.loadPatients();
+//        Map<Integer, Patient> patientsMap = Handler.loadPatients();
     }
 
 
-    public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, boolean emergency, int roomNumber) {
+    public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, boolean emergency, int roomNumber, String doctorInCharge) {
         super(name, address, phoneNumber);
         this.gender = gender;
         this.symptoms = symptoms;
@@ -93,10 +93,13 @@ public class Patient extends Person {
     }
 
 
-    public void setDoctorInCharge(int doctorInCharge) {
+    public void setDoctorInCharge(String doctorInCharge) {
         this.doctorInCharge = doctorInCharge;
     }
 
+    public String getDoctorInCharge(){
+        return doctorInCharge;
+    }
 
     public static boolean save() {
     DatabaseConnector.connect();
@@ -128,6 +131,7 @@ public class Patient extends Person {
             preparedStmt.setString(8, patient.getDiagnosis());
             preparedStmt.setBoolean(9, patient.isEmergency());
             preparedStmt.setInt(10, patient.getRoomNumber());
+            preparedStmt.setString(11, patient.getDoctorInCharge());
             preparedStmt.execute();
         }
     } catch (SQLException e) {
@@ -136,161 +140,83 @@ public class Patient extends Person {
     return true;
 }
 
-public boolean editPatient() {
-        DatabaseConnector.connect();
-        String sql = "UPDATE patients SET name = ?, address = ?, phoneNumber = ?, gender = ?, symptoms = ?, paymentMethod = ?, diagnosis = ?, emergency = ?, roomNumber = ? WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
+    public boolean editPatient(String newName, String newAddress, String newPhoneNumber, String newGender, String newSymptoms, String newPaymentMethod, String newDiagnosis, Boolean newEmergency, Integer newRoomNumber, String newDoctorInCharge) {
+        // Retrieve the patient object from the map
+        Patient patient = patientsMap.get(this.getID());
 
-            preparedStmt.setString(1, this.name);
-            preparedStmt.setString(2, this.address);
-            preparedStmt.setString(3, this.phoneNumber);
-            preparedStmt.setString(4, this.gender);
-            preparedStmt.setString(5, this.symptoms);
-            preparedStmt.setString(6, this.paymentMethod);
-            preparedStmt.setString(7, this.diagnosis);
-            preparedStmt.setBoolean(8, this.emergency);
-            preparedStmt.setInt(9, this.roomNumber);
-            preparedStmt.setInt(10, this.ID);
-            return preparedStmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if (patient != null) {
+            // Update fields only if new values are provided
+            patient.name = (newName != null) ? newName : patient.name;
+            patient.address = (newAddress != null) ? newAddress : patient.address;
+            patient.phoneNumber = (newPhoneNumber != null) ? newPhoneNumber : patient.phoneNumber;
+            patient.gender = (newGender != null) ? newGender : patient.gender;
+            patient.symptoms = (newSymptoms != null) ? newSymptoms : patient.symptoms;
+            patient.paymentMethod = (newPaymentMethod != null) ? newPaymentMethod : patient.paymentMethod;
+            patient.diagnosis = (newDiagnosis != null) ? newDiagnosis : patient.diagnosis;
+            patient.emergency = (newEmergency != null) ? newEmergency : patient.emergency;
+            patient.roomNumber = (newRoomNumber != null) ? newRoomNumber : patient.roomNumber;
+            patient.doctorInCharge = (newDoctorInCharge != null) ? newDoctorInCharge : patient.doctorInCharge;
+
+            return true;
         }
+        return false;
     }
 
-public boolean setPaymentMethods(String type) {
-        DatabaseConnector.connect();
-        String sql = "UPDATE patients SET paymentMethod = ? WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
+// public boolean setPaymentMethods(String type) {
+//         DatabaseConnector.connect();
+//         String sql = "UPDATE patients SET paymentMethod = ? WHERE idpatients = ?";
+//         try (var connection = DatabaseConnector.connection();
+//              PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
 
-            preparedStmt.setString(1, type);
-            preparedStmt.setInt(2, this.ID);
-            return preparedStmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//             preparedStmt.setString(1, type);
+//             preparedStmt.setInt(2, this.ID);
+//             return preparedStmt.executeUpdate() > 0;
+//         } catch (SQLException e) {
+//             throw new RuntimeException(e);
+//         }
+//     }
 
-public int addSymptoms(String symptoms) {
-        this.symptoms = symptoms; // Update locally
-        DatabaseConnector.connect();
-        String sql = "UPDATE patients SET symptoms = ? WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
-
-            preparedStmt.setString(1, this.symptoms);
-            preparedStmt.setInt(2, this.ID);
-            return preparedStmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-public String[] displaySymptoms(int requestID) {
-        DatabaseConnector.connect();
-        String sql = "SELECT symptoms FROM patients WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
-
-            preparedStmt.setInt(1, requestID);
-            ResultSet rs = preparedStmt.executeQuery();
-            if (rs.next()) {
-                //symptoms are stored as a string separated by commas
-                return rs.getString("symptoms").split(",");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return new String[]{};
-    }
-
-public String removeSymptoms(int requestID) {
-        DatabaseConnector.connect();
-        String sql = "UPDATE patients SET symptoms = '' WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
-
-            preparedStmt.setInt(1, requestID);
-            preparedStmt.executeUpdate();
-            return "Symptoms removed";
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-public int addDiagnosis(String diagnosis) {
-        this.diagnosis = diagnosis;
-        DatabaseConnector.connect();
-        String sql = "UPDATE patients SET diagnosis = ? WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
-
-            preparedStmt.setString(1, this.diagnosis);
-            preparedStmt.setInt(2, this.ID);
-            return preparedStmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String displayDiagnosis() {
-        DatabaseConnector.connect();
-        String sql = "SELECT diagnosis FROM patients WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
-
-            preparedStmt.setInt(1, this.ID);
-            ResultSet rs = preparedStmt.executeQuery();
-            if (rs.next()) {
-                return rs.getString("diagnosis");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return "";
-    }
 
 //    public boolean createAppointment(Appointment data) {
 //        return Handler.saveAppointment(data);
 //    }
 
-    public boolean addDoctorInCharge(int doctorID) {
-        DatabaseConnector.connect();
-        String sql = "UPDATE patients SET doctorID = ? WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
-
-            preparedStmt.setInt(1, doctorID);
-            preparedStmt.setInt(2, this.ID);
-            if (preparedStmt.executeUpdate() > 0) {
-                this.doctorInCharge = doctorID;
-                return true;
-            }
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public int getDoctorInCharge() {
-        DatabaseConnector.connect();
-        String sql = "SELECT physicianID FROM patients WHERE idpatients = ?";
-        try (var connection = DatabaseConnector.connection();
-             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
-
-            preparedStmt.setInt(1, this.ID);
-            ResultSet rs = preparedStmt.executeQuery();
-            if (rs.next()) {
-                int doctorID = rs.getInt("doctorID");
-                this.doctorInCharge = doctorID;
-                return doctorID;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return -1;
-    }
+//    public boolean addDoctorInCharge(int doctorID) {
+//        DatabaseConnector.connect();
+//        String sql = "UPDATE patients SET doctorID = ? WHERE idpatients = ?";
+//        try (var connection = DatabaseConnector.connection();
+//             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
+//
+//            preparedStmt.setInt(1, doctorID);
+//            preparedStmt.setInt(2, this.ID);
+//            if (preparedStmt.executeUpdate() > 0) {
+//                this.doctorInCharge = doctorID;
+//                return true;
+//            }
+//            return false;
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    public int getDoctorInCharge() {
+//        DatabaseConnector.connect();
+//        String sql = "SELECT physicianID FROM patients WHERE idpatients = ?";
+//        try (var connection = DatabaseConnector.connection();
+//             PreparedStatement preparedStmt = connection.prepareStatement(sql)) {
+//
+//            preparedStmt.setInt(1, this.ID);
+//            ResultSet rs = preparedStmt.executeQuery();
+//            if (rs.next()) {
+//                int doctorID = rs.getInt("doctorID");
+//                this.doctorInCharge = doctorID;
+//                return doctorID;
+//            }
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return -1;
+//    }
 
 
 public boolean delete(Patient patient) {

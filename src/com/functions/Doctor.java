@@ -15,10 +15,10 @@ public class Doctor extends Person{
     private static int lastId = loadLastId();
     private final int ID = lastId++;
     private static HashSet<Doctor> doctors = new HashSet<>();
-
+    private static Map<Integer, Doctor> doctorHashMap = Handler.loadDoctors();
     static {
         doctors = loadToHashSet(); // Load from database after initialization
-        Map<Integer, Doctor> doctorHashMap = Handler.loadDoctors();
+//        Map<Integer, Doctor> doctorHashMap = Handler.loadDoctors();
     }
 
     public Doctor(String name, String address, String phoneNumber, String specialty) {
@@ -92,6 +92,22 @@ public class Doctor extends Person{
         return true;
     }
 
+    public boolean editDoctor(Integer doctorId, String newName, String newAddress, String newPhoneNumber, String newSpecialty) {
+        // Retrieve the doctor object from the map using the provided doctorId
+        Doctor doctor = doctorHashMap.get(doctorId);
+
+        if (doctor != null) {
+            // Update fields only if new values are provided
+            doctor.name = (newName != null) ? newName : doctor.name;
+            doctor.address = (newAddress != null) ? newAddress : doctor.address;
+            doctor.phoneNumber = (newPhoneNumber != null) ? newPhoneNumber : doctor.phoneNumber;
+            doctor.specialty = (newSpecialty != null) ? newSpecialty : doctor.specialty;
+
+
+            return true;
+        }
+        return false;
+    }
 
 
     public boolean delete(Doctor doctor) {
