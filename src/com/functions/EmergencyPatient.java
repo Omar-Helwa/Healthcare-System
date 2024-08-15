@@ -6,7 +6,7 @@ public class EmergencyPatient extends Patient {
     
     public EmergencyPatient(String name, String address, String phoneNumber, String gender,
      String symptoms,String paymentMethod, String diagnosis,boolean emergency, int roomNumber) {
-        super(name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, emergency, roomNumber);
+        super(name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, emergency);
         setEmergency(true);
         this.roomNumber = roomNumber;
         // this.doctorInCharge = new Doctor[0];

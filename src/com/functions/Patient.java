@@ -12,7 +12,6 @@ public class Patient extends Person {
     private String paymentMethod;
     private String diagnosis;
     private boolean emergency;
-    private int roomNumber;
     private String doctorInCharge;
     private static int lastId = loadLastId();
     private final int ID;
@@ -24,14 +23,13 @@ public class Patient extends Person {
     }
 
 
-    public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, boolean emergency, int roomNumber, String doctorInCharge) {
+    public Patient(String name, String address, String phoneNumber, String gender, String symptoms, String paymentMethod, String diagnosis, boolean emergency) {
         super(name, address, phoneNumber);
         this.gender = gender;
         this.symptoms = symptoms;
         this.paymentMethod = paymentMethod;
         this.diagnosis = diagnosis;
         this.emergency = emergency;
-        this.roomNumber = roomNumber;
         this.doctorInCharge = doctorInCharge;
         ID = lastId++;
         addPatient(this);
@@ -84,13 +82,6 @@ public class Patient extends Person {
         return ID;
     }
 
-    public int getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(int roomNumber) {
-        this.roomNumber = roomNumber;
-    }
 
 
     public void setDoctorInCharge(String doctorInCharge) {
@@ -104,7 +95,7 @@ public class Patient extends Person {
     public static boolean save() {
     DatabaseConnector.connect();
     String checkQuery = "SELECT COUNT(*) FROM patients WHERE phoneNumber = ?";
-    String sql = "INSERT INTO patients (idpatients, name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, emergency, roomNumber)"
+    String sql = "INSERT INTO patients (idpatients, name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, emergency)"
             + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try (var connection = DatabaseConnector.connection();
@@ -130,7 +121,6 @@ public class Patient extends Person {
             preparedStmt.setString(7, patient.getPaymentMethod());
             preparedStmt.setString(8, patient.getDiagnosis());
             preparedStmt.setBoolean(9, patient.isEmergency());
-            preparedStmt.setInt(10, patient.getRoomNumber());
             preparedStmt.setString(11, patient.getDoctorInCharge());
             preparedStmt.execute();
         }
@@ -154,7 +144,6 @@ public class Patient extends Person {
             patient.paymentMethod = (newPaymentMethod != null) ? newPaymentMethod : patient.paymentMethod;
             patient.diagnosis = (newDiagnosis != null) ? newDiagnosis : patient.diagnosis;
             patient.emergency = (newEmergency != null) ? newEmergency : patient.emergency;
-            patient.roomNumber = (newRoomNumber != null) ? newRoomNumber : patient.roomNumber;
             patient.doctorInCharge = (newDoctorInCharge != null) ? newDoctorInCharge : patient.doctorInCharge;
 
             return true;
@@ -271,6 +260,6 @@ private static HashSet<Patient> loadToHashSet(){
 
 @Override
 public String toString() {
-    return "Patient{[%d] %s %s %s %s %s %s %s %b %d}".formatted(getID(), name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, emergency, roomNumber);
+    return "Patient{[%d] %s %s %s %s %s %s %s %b %d}".formatted(getID(), name, address, phoneNumber, gender, symptoms, paymentMethod, diagnosis, emergency);
 }
 }

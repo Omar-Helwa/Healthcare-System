@@ -46,21 +46,6 @@ public class Doctor extends Person{
         doctors.add(doctor);
     }
 
-    // Method to edit doctor info
-//    public static void editDoctor(int id, String name, String address, String phoneNumber, String gender, String specialty) {
-//        for (Doctor doctor : doctors) {
-//            if (doctor.id == id) {
-//                doctor.name = name;
-//                doctor.address = address;
-//                doctor.phoneNumber = phoneNumber;
-//                doctor.gender = gender;
-//                doctor.specialty = specialty;
-//                return;
-//            }
-//        }
-//    }
-
-
     public static boolean save() {
         DatabaseConnector.connect();
         String sql = "INSERT INTO doctors (idDoctors, name, address, phoneNumber, specialty) VALUES (?, ?, ?, ?, ?)";
